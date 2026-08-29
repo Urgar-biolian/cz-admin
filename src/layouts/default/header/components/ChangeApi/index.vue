@@ -29,19 +29,18 @@ import { BasicForm, useForm } from "@/components/Form";
 import { ref } from "vue";
 import { useAppStore } from "@/store/modules/app";
 import type { ApiAddress } from "#/store";
+import { useGlobSetting } from "@/hooks/setting";
 
 const appStore = useAppStore();
 const RadioGroup = Radio.Group;
 const { t } = useI18n();
+const { apiUrl } = useGlobSetting(); //Ugar-biolian
 const [register, { closeModal }] = useModalInner(async () => {
   initData();
 });
-// perf 能读取所有.env.xxx文件最好, 另外key与--mode XXX最好相同
-const addresses = ref({
-  development: "http://www.a.com",
-  test: "http://www.b.com",
-  prod: "http://www.c.com",
-});
+const addresses = ref({ //Ugar-biolian
+  [import.meta.env.MODE || "development"]: apiUrl, //Ugar-biolian
+}); //Ugar-biolian
 const radioStyle = ref({
   display: "flex",
   height: "30px",

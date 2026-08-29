@@ -11,11 +11,12 @@ import { useUserStore } from "@/store/modules/user";
 enum Api {
   Login = "/login",
   Logout = "/logout",
-    GetUserInfo = "/getUserInfo",
-    GetAllUser = "/all",
+  GetUserInfo = "/getUserInfo",
+  GetAllUser = "/all",
+  GetAdminUsers = "/admin/users",
+  GetAdminUserOptions = "/admin/user-options",
   GetPermCode = "/getPermCode",
-    TestRetry = "/testRetry",
-  SetUserRole = "/setUserRole",
+  TestRetry = "/testRetry",
 }
 
 /**
@@ -25,12 +26,10 @@ export function loginApi(
   params: LoginParams,
   mode: ErrorMessageMode = "modal",
 ) {
-
   return defHttp.post<LoginResultModel>(
     {
       url: Api.Login,
-      data: params
-
+      data: params,
     },
     {
       errorMessageMode: mode,
@@ -41,42 +40,74 @@ export function loginApi(
 /**
  * @description: getUserInfo
  */
-export function getUserInfo() {
-  const userId = useUserStore().getUserInfo.userId;
-
+export function getUserInfo(userId?: string | number) {
+  const resolvedUserId = userId ?? useUserStore().getUserInfo.userId;
 
   return defHttp.get<GetUserInfoModel>(
-    { url: Api.GetUserInfo + `/${userId}`,  },
+    { url: Api.GetUserInfo + `/${resolvedUserId}` },
     { errorMessageMode: "none" },
   );
 }
 
-export function setUserRole(userId, role) {
-
-    return defHttp.get<GetUserInfoModel>(
-        {
-            url: Api.SetUserRole + `/${userId}`,
-            params: {
-                role:role
-            }
-        },
-        { errorMessageMode: "message" },
-    );
+export function setUserRole(
+  userId: number,
+  payload: {
+    role: string;
+    memberType?: "STUDENT" | "GRADUATED" | "ADVISOR";
+    admissionYear?: number | null;
+  },
+) {
+  return defHttp.patch<GetUserInfoModel>(
+    {
+      url: `${Api.GetAdminUsers}/${userId}`,
+      data: payload,
+    },
+    {
+      errorMessageMode: "message",
+      retryRequest: {
+        isOpenRetry: false,
+        count: 0,
+        waitTime: 0,
+      },
+    },
+  );
 }
 
 export function getAllUser() {
-
-    return defHttp.get<GetUserInfoModel[]>(
-        { url: Api.GetAllUser },
-        { errorMessageMode: "none" },
-    );
+  return defHttp.get<GetUserInfoModel[]>(
+    { url: Api.GetAllUser },
+    { errorMessageMode: "none" },
+  );
 }
 
-export function getUserInfoById(userId:number) {
+export function getAdminUserPage(params: {
+  page?: number;
+  pageSize?: number;
+  username?: string;
+  role?: string;
+  major?: string;
+  memberType?: "STUDENT" | "GRADUATED" | "ADVISOR" | "";
+  admissionYear?: number;
+}) {
+  return defHttp.get<{ items: GetUserInfoModel[]; total: number }>(
+    {
+      url: Api.GetAdminUsers,
+      params,
+    },
+    { errorMessageMode: "none" },
+  );
+}
 
+export function getAdminUserOptions() {
+  return defHttp.get<Array<{ userId: number; username: string }>>(
+    { url: Api.GetAdminUserOptions },
+    { errorMessageMode: "none" },
+  );
+}
 
+export function getUserInfoById(userId: number) {
   return defHttp.get<GetUserInfoModel>(
-    { url: Api.GetUserInfo + `/${userId}`, },
+    { url: Api.GetUserInfo + `/${userId}` },
     { errorMessageMode: "none" },
   );
 }
@@ -86,7 +117,14 @@ export function getPermCode() {
 }
 
 export function doLogout() {
-  return Promise.resolve();
+  return defHttp
+    .post(
+      { url: Api.Logout },
+      {
+        errorMessageMode: "none",
+      },
+    )
+    .catch(() => Promise.resolve());
 }
 
 export function testRetry() {

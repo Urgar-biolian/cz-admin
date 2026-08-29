@@ -138,7 +138,7 @@ export default defineComponent({
             }
             return isFunction(render)
               ? render(getField, _data)
-              : getField ?? "";
+              : (getField ?? "");
           };
 
           const width = contentMinWidth;

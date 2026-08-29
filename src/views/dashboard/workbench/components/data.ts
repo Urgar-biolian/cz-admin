@@ -43,7 +43,7 @@ export const navItems: NavItem[] = [
   },
   {
     title: "成员",
-      icon: "tdesign:member",
+    icon: "tdesign:member",
     color: "#4daf1bc9",
   },
   {

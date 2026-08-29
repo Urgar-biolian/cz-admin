@@ -3,6 +3,7 @@ import type { Router, RouteRecordRaw } from "vue-router";
 import { usePermissionStoreWithOut } from "@/store/modules/permission";
 
 import { PageEnum } from "@/enums/pageEnum";
+import { RoleEnum } from "@/enums/roleEnum";
 import { useUserStoreWithOut } from "@/store/modules/user";
 
 import { PAGE_NOT_FOUND_ROUTE } from "@/router/routes/basic";
@@ -79,10 +80,29 @@ export function createPermissionGuard(router: Router) {
     if (userStore.getLastUpdateTime === 0) {
       try {
         await userStore.getUserInfoAction();
-      } catch (err) {
-        next();
+      } catch {
+        userStore.clearAuthState();
+        next({
+          path: LOGIN_PATH,
+          replace: true,
+          query: {
+            redirect: to.fullPath,
+          },
+        });
         return;
       }
+    }
+
+    if (!userStore.getRoleList.includes(RoleEnum.ADMIN)) {
+      userStore.clearAuthState();
+      next({
+        path: LOGIN_PATH,
+        replace: true,
+        query: {
+          redirect: to.fullPath,
+        },
+      });
+      return;
     }
 
     // 动态路由加载（首次）

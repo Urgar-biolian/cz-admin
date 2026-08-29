@@ -43,6 +43,7 @@ import { uploadContainerProps } from "../props";
 import { isImgTypeByName } from "../helper";
 import { UploadResultStatus } from "@/components/Upload/src/types/typing";
 import { get, omit } from "lodash-es";
+
 defineOptions({ name: "ImageUpload" });
 
 const emit = defineEmits(["change", "update:value", "delete"]);

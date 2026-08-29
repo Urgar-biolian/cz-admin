@@ -32,3 +32,8 @@ package-lock.json
 pnpm-lock.yaml
 
 .history
+
+*.tgz
+.dbg/
+cz-admin-backend/target/
+

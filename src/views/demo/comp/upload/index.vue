@@ -65,7 +65,7 @@ const schemasCustom: FormSchema[] = [
             resolve({
               code: 200,
               data3: {
-                url: uploadApiResponse.data.url,
+                url: uploadApiResponse.url,
               },
             });
           });
@@ -88,7 +88,7 @@ const schemasCustom: FormSchema[] = [
             resolve({
               code: 200,
               data4: {
-                url: uploadApiResponse.data.url,
+                url: uploadApiResponse.url,
               },
             });
           });
@@ -156,7 +156,7 @@ const schemasPreview: FormSchema[] = [
             resolve({
               code: 200,
               data5: {
-                url: uploadApiResponse.data.url,
+                url: uploadApiResponse.url,
               },
             });
           });

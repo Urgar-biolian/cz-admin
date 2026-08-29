@@ -209,6 +209,13 @@ export class VAxios {
     return this.request({ ...config, method: "PUT" }, options);
   }
 
+  patch<T = any>(
+    config: AxiosRequestConfig,
+    options?: RequestOptions,
+  ): Promise<T> {
+    return this.request({ ...config, method: "PATCH" }, options);
+  }
+
   delete<T = any>(
     config: AxiosRequestConfig,
     options?: RequestOptions,
@@ -268,18 +275,20 @@ export class VAxios {
           if (axios.isAxiosError(e)) {
             // rewrite error message from axios in here
           }
-            if (Reflect.has(e, "message") && e.message === 'Request failed with status code 403') {
-                
-            }
-            
+          if (
+            Reflect.has(e, "message") &&
+            e.message === "Request failed with status code 403"
+          ) {
+          }
+
           if (Reflect.has(e, "response")) {
-            const msgs = e['response'].data.messages || e['response'].data.message;
+            const msgs =
+              e["response"].data.messages || e["response"].data.message;
             if (typeof msgs === "object") {
               const firstKey = Object.keys(msgs)[0];
               e.message = `${firstKey}: ${msgs[firstKey]}`;
             } else {
               e.message = msgs;
-
             }
           }
           reject(e);

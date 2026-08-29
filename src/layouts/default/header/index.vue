@@ -47,14 +47,10 @@
         :class="`${prefixCls}-action__item error-action`"
       />
 
-
-
       <FullScreen
         v-if="getShowFullScreen"
         :class="`${prefixCls}-action__item fullscreen-item`"
       />
-
-
 
       <UserDropDown :theme="getHeaderTheme" />
 
@@ -69,7 +65,7 @@
 import { Layout } from "ant-design-vue";
 import { computed, unref } from "vue";
 
-import {  AppLogo, AppSearch } from "@/components/Application";
+import { AppLogo, AppSearch } from "@/components/Application";
 import { SettingButtonPositionEnum } from "@/enums/appEnum";
 import { MenuModeEnum, MenuSplitTyeEnum } from "@/enums/menuEnum";
 import { useHeaderSetting } from "@/hooks/setting/useHeaderSetting";
@@ -121,7 +117,6 @@ const {
   getShowHeader,
   getShowSearch,
 } = useHeaderSetting();
-
 
 const { getIsMobile } = useAppInject();
 

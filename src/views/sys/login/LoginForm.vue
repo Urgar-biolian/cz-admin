@@ -123,14 +123,12 @@ const formRef = ref();
 const loading = ref(false);
 // const rememberMe = ref(false);
 
-const formData = reactive(
-  localStorage.getItem("account-remember-me")
-    ? JSON.parse(localStorage.getItem("account-remember-me")!)
-    : {
-        account: "",
-        password: "",
-      },
-);
+const ACCOUNT_STORAGE_KEY = "account-remember-me"; //Ugar-biolian
+const rememberedAccount = localStorage.getItem(ACCOUNT_STORAGE_KEY) || ""; //Ugar-biolian
+const formData = reactive({ //Ugar-biolian
+  account: rememberedAccount, //Ugar-biolian
+  password: "", //Ugar-biolian
+}); //Ugar-biolian
 
 const { validForm } = useFormValid(formRef);
 
@@ -149,14 +147,13 @@ async function handleLogin() {
       mode: "none", //不要默认的错误提示
     });
     if (userInfo) {
-      console.log(userInfo);
-
       notification.success({
         message: t("sys.login.loginSuccessTitle"),
         description: `${t("sys.login.loginSuccessDesc")}: ${userInfo.username}`,
         duration: 3,
       });
-      localStorage.setItem("account-remember-me", JSON.stringify(formData));
+      localStorage.setItem(ACCOUNT_STORAGE_KEY, formData.account); //Ugar-biolian
+      formData.password = ""; //Ugar-biolian
     }
   } catch (error) {
     createErrorModal({

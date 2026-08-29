@@ -11,15 +11,15 @@ export function createFakeUserList() {
     {
       userId: "1",
       username: "huanxiaomang",
-      email:"atri2022@163.com",
-      avatar: "https://i1.hdslb.com/bfs/face/6bc5d59334e3430ebc019d4fecd463e4df028e8c.jpg@240w_240h_1c_1s_!web-avatar-nav.avif",
+      email: "atri2022@163.com",
+      avatar:
+        "https://i1.hdslb.com/bfs/face/6bc5d59334e3430ebc019d4fecd463e4df028e8c.jpg@240w_240h_1c_1s_!web-avatar-nav.avif",
       description: "gegwgfr23rf3frewdv345refv456ytrgfv",
       password: "123456",
       token: "fakeToken1",
-      github: 'https://github.com/huanxiaomang',
-      role:"ADMIN"
+      github: "https://github.com/huanxiaomang",
+      role: "ADMIN",
     },
-
   ];
 }
 const fakeCodeList: any = {

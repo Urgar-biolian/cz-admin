@@ -25,7 +25,7 @@
     "test:gzip": "npx http-server dist --cors --gzip -c-1",
     "type:check": "vue-tsc --noEmit --skipLibCheck",
     "start": "bash start.sh",
-    "deloy":"deloy.sh"
+    "deloy": "deloy.sh"
   },
   "dependencies": {
     "@ant-design/icons-vue": "^7.0.1",
@@ -36,7 +36,7 @@
     "@vue/shared": "^3.4.19",
     "@vueuse/core": "^10.7.2",
     "@zxcvbn-ts/core": "^3.0.4",
-    "ant-design-vue": "^4.1.2",
+    "ant-design-vue": "^4.2.6",
     "axios": "^1.6.7",
     "codemirror": "^5.65.16",
     "cropperjs": "^1.6.1",
