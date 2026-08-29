@@ -8,12 +8,10 @@ export interface ProjectParams {
   members: string;
 }
 
-
 /**
  * @description: Project interface return value
  */
-export interface ProjectResultModel {
-  data: [];
+export interface ProjectItem {
   id: number;
   title: string;
   content: string;
@@ -21,3 +19,4 @@ export interface ProjectResultModel {
   members: string;
 }
 
+export type ProjectResultModel = ProjectItem[];

@@ -1,103 +1,166 @@
 <template>
-    <PageWrapper title="成员管理">
-        <template #headerContent>
-            <div>
-                <div class="mb-3">
-                    支持查看成员信息、修改成员权限。
-                </div>
-                筛选成员: <Select v-model:value="selectedRole" class="ml-3 w-35">
-                    <SelectOption value="ALL">所有成员</SelectOption>
-                    <SelectOption value="ADMIN">创智管理员</SelectOption>
-                    <SelectOption value="CZ_MEMBER">创智成员</SelectOption>
-                    <SelectOption value="COMMON">普通用户</SelectOption>
-                </Select>
-            </div>
+  <PageWrapper dense contentFullHeight>
+    <BasicTable @register="registerTable">
+      <template #bodyCell="{ column, record }">
+        <template v-if="column.dataIndex === 'userId'">
+          <CZAvatar :userId="record.userId" />
         </template>
-        <Card v-for="m of filterMembers" :key="m.userId" class="mb-6">
-            <div class="flex items-center justify-between md:flex-row flex-col gap-5">
-                <span class="flex items-center">
-                    <CZAvatar :userId="m.userId"></CZAvatar>
-                    <span class="ml-6 text-lg cursor-pointer" :class="colorList[m.userId]"
-                        @click="showUserModal(m)">{{ m.username }}</span>
-                </span>
+        <template v-if="column.dataIndex === 'username'">
+          <span
+            class="cursor-pointer font-medium"
+            :class="getUsernameClassByRole(record.role)"
+            @click="showUserModal(record)"
+          >
+            {{ record.username }}
+          </span>
+        </template>
+        <template v-if="column.dataIndex === 'action'">
+          <TableAction
+            :actions="[
+              {
+                icon: 'clarity:note-edit-line',
+                tooltip: '编辑成员信息',
+                onClick: handleEdit.bind(null, record),
+              },
+            ]"
+          />
+        </template>
+      </template>
+    </BasicTable>
 
-                <span class="md:inline hidden">{{ m.createdAt.replace('T', ' ').replace('Z', '') }}</span>
-                <Select v-model:value="roles[m.userId]" class="w-35" @change="handleChange(Number(m.userId))">
-                    <SelectOptGroup>
-                        <template #label>
-                            <span>
-                                <Icon icon="tdesign:member" size="12">
-                                </Icon>
-                                Member
-                            </span>
-                        </template>
-                        <SelectOption value="ADMIN">创智管理员</SelectOption>
-                        <SelectOption value="CZ_MEMBER">创智成员</SelectOption>
-                    </SelectOptGroup>
-                    <SelectOptGroup>
-                        <template #label>
-                            <span>
-                                Common
-                            </span>
-                        </template>
-                        <SelectOption value="COMMON">普通用户</SelectOption>
-                    </SelectOptGroup>
-                </Select>
-            </div>
-        </Card>
-    </PageWrapper>
+    <Modal
+      v-model:open="editModalVisible"
+      title="修改成员权限"
+      @ok="handleSaveRole"
+      :confirmLoading="isSaving"
+    >
+      <div class="pt-4 px-4">
+        <div class="mb-4">
+          <span class="inline-block w-20 text-right mr-4">成员：</span>
+          <span class="font-bold">{{ currentUser?.username }}</span>
+        </div>
+        <div class="mb-4">
+          <span class="inline-block w-20 text-right mr-4">角色：</span>
+          <Select v-model:value="editRole" class="w-48">
+            <SelectOptGroup>
+              <template #label>
+                <span>创智团队</span>
+              </template>
+              <SelectOption value="ADMIN">创智管理员</SelectOption>
+              <SelectOption value="CZ_MEMBER">创智成员</SelectOption>
+            </SelectOptGroup>
+            <SelectOptGroup>
+              <template #label>
+                <span>普通用户</span>
+              </template>
+              <SelectOption value="COMMON">普通用户</SelectOption>
+            </SelectOptGroup>
+          </Select>
+        </div>
+        <div class="mb-4">
+          <span class="inline-block w-20 text-right mr-4">身份：</span>
+          <Select v-model:value="editMemberType" class="w-48">
+            <SelectOption value="STUDENT">在读成员</SelectOption>
+            <SelectOption value="GRADUATED">已毕业</SelectOption>
+            <SelectOption value="ADVISOR">指导老师</SelectOption>
+          </Select>
+        </div>
+        <div>
+          <span class="inline-block w-20 text-right mr-4">入学年份：</span>
+          <Select v-model:value="editAdmissionYear" class="w-48" :disabled="editMemberType === 'ADVISOR'">
+            <SelectOption
+              v-for="option in admissionYearOptions"
+              :key="option.value"
+              :value="option.value"
+            >
+              {{ option.label }}
+            </SelectOption>
+          </Select>
+        </div>
+      </div>
+    </Modal>
+  </PageWrapper>
 </template>
 
-<script setup lang='ts'>
-import { Card,/*Button*/Select, SelectOption, SelectOptGroup } from "ant-design-vue";
+<script setup lang="ts">
+import { ref } from "vue";
+import { BasicTable, useTable, TableAction } from "@/components/Table";
 import { PageWrapper } from "@/components/Page";
-import { computed, onMounted, ref, /*watchEffect*/ } from "vue";
+import { Modal, Select, SelectOption, SelectOptGroup, message } from "ant-design-vue";
+import { getAdminUserPage, setUserRole } from "@/api/sys/user";
 import { GetUserInfoModel } from "@/api/sys/model/userModel";
-import { /*sortByUpdate*/ } from "@/utils/sortByUpdate";
-import { getAllUser, setUserRole } from "@/api/sys/user";
+import { columns, searchFormSchema } from "./member.data";
 import CZAvatar from "@/components/cz/CZAvatar.vue";
-import Icon from "@/components/Icon/Icon.vue";
 import { getUsernameClassByRole } from "@/utils/getUsernameClass";
-import showUserModal from '@/components/cz/UserModal';
+import showUserModal from "@/components/cz/UserModal";
+import { getAdmissionYearOptions } from "@/utils/memberProfile";
 
-let members = ref<GetUserInfoModel[]>([]);
-const roles = ref({});
-const colorList = ref({});
-const selectedRole = ref<'ADMIN' | 'CZ_MEMBER' | 'COMMON' | 'ALL'>('ALL');
-let filterMembers = computed<GetUserInfoModel[]>(() => {
-    if (selectedRole.value === 'ALL') {
-        return members.value;
-    } else {
-        return members.value.filter(m => m.role === selectedRole.value);
-    }
+const editModalVisible = ref(false);
+const isSaving = ref(false);
+const currentUser = ref<GetUserInfoModel | null>(null);
+const editRole = ref<string>("");
+const editMemberType = ref<"STUDENT" | "GRADUATED" | "ADVISOR">("STUDENT");
+const editAdmissionYear = ref<number | undefined>();
+const admissionYearOptions = getAdmissionYearOptions();
+
+const [registerTable, { reload }] = useTable({
+  title: "成员管理",
+  api: async (params) => {
+    return await getAdminUserPage({
+      page: Number(params.page || 1),
+      pageSize: Number(params.pageSize || 10),
+      username: params.username || undefined,
+      role: params.role || undefined,
+      admissionYear: params.admissionYear ? Number(params.admissionYear) : undefined,
+      memberType: params.memberType || undefined,
+      major: params.major || undefined,
+    });
+  },
+  columns,
+  formConfig: {
+    labelWidth: 80,
+    schemas: searchFormSchema,
+    autoSubmitOnEnter: true,
+  },
+  useSearchForm: true,
+  showTableSetting: true,
+  bordered: true,
+  showIndexColumn: false,
+  actionColumn: {
+    width: 80,
+    title: "操作",
+    dataIndex: "action",
+  },
 });
 
-
-function updateClassList() {
-    colorList.value = members.value.reduce((obj, { userId, role }) => {
-        obj[userId] = getUsernameClassByRole(role);
-        return obj;
-    }, {});
+function handleEdit(record: GetUserInfoModel) {
+  currentUser.value = record;
+  editRole.value = record.role;
+  editMemberType.value = (record.memberType || "STUDENT") as "STUDENT" | "GRADUATED" | "ADVISOR";
+  editAdmissionYear.value = record.admissionYear;
+  editModalVisible.value = true;
 }
 
-onMounted(async () => {
-    members.value = await getAllUser();
-    roles.value = members.value.reduce((obj, { userId, role }) => {
-        obj[userId] = role;
-        return obj;
-    }, {});
-    updateClassList();
-
-})
-
-
-
-
-const handleChange = async (userId: number) => {
-
-    const user = await setUserRole(userId, roles.value[userId]);
-    colorList.value[userId] = getUsernameClassByRole(user.role);
-};
-
+async function handleSaveRole() {
+  if (!currentUser.value) return;
+  if (editMemberType.value !== "ADVISOR" && !editAdmissionYear.value) {
+    message.warning("请先选择入学年份");
+    return;
+  }
+  try {
+    isSaving.value = true;
+    await setUserRole(Number(currentUser.value.userId), {
+      role: editRole.value,
+      memberType: editMemberType.value,
+      admissionYear: editMemberType.value === "ADVISOR" ? undefined : editAdmissionYear.value,
+    });
+    message.success("成员信息修改成功");
+    editModalVisible.value = false;
+    reload();
+  } catch (error) {
+    // 错误已由 axios 拦截器处理
+  } finally {
+    isSaving.value = false;
+  }
+}
 </script>
-@/utils/sortByCreated

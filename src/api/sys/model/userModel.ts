@@ -16,8 +16,22 @@ export interface RoleInfo {
  */
 export interface LoginResultModel {
   userId: string | number;
+  username?: string;
+  email?: string;
   token: string;
+  role?: string;
   roles: RoleInfo[];
+  avatar?: string;
+  github?: string;
+  major?: string;
+  grade?: number;
+  admissionYear?: number;
+  memberType?: "STUDENT" | "GRADUATED" | "ADVISOR";
+  gradeLabel?: string;
+  badge?: string;
+  background?: string;
+  description?: string;
+  createdAt?: string;
 }
 
 /**
@@ -30,8 +44,17 @@ export interface GetUserInfoModel {
   avatar?: string;
   description?: string;
   role: string;
+  roles?: RoleInfo[];
+  permissions?: string[];
   email: string;
   background?: string;
   token: string;
   github?: string;
+  major?: string;
+  grade?: number;
+  admissionYear?: number;
+  memberType?: "STUDENT" | "GRADUATED" | "ADVISOR";
+  gradeLabel?: string;
+  badge?: string;
+  homePath?: string;
 }

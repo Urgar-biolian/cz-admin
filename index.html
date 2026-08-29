@@ -2,6 +2,21 @@
 <html lang="zh" id="htmlRoot">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      // 修复 hash 模式下无 # 前缀的路径访问（如 /login -> /#/login）
+      (function () {
+        var path = window.location.pathname || "";
+        var hash = window.location.hash || "";
+        if (hash === "" && path !== "/" && path !== "") {
+          var cleanPath = path.replace(/\/+$/, "");
+          if (cleanPath !== "") {
+            window.location.replace(
+              window.location.origin + "/#" + cleanPath + window.location.search,
+            );
+          }
+        }
+      })();
+    </script>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <meta name="renderer" content="webkit" />
     <meta

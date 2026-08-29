@@ -1,6 +1,10 @@
 <template>
   <div class="lg:flex">
-    <Avatar :src="userinfo.avatar || headerImg" :size="72" class="!mx-auto !block" />
+    <Avatar
+      :src="userinfo.avatar || headerImg"
+      :size="72"
+      class="!mx-auto !block"
+    />
     <div class="md:ml-6 flex flex-col justify-center md:mt-0 mt-2">
       <h1 class="md:text-lg text-md">
         早安, {{ userinfo.username }}, 开始您一天的工作吧！

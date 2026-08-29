@@ -49,19 +49,19 @@ const infoSchema: DescItem[] = [
   {
     label: "作者",
     field: "author",
-      render: commonLinkRender("huanxiaomang") ,
+    render: commonLinkRender("huanxiaomang"),
   },
 
   {
     label: "Github",
     field: "github",
     render: commonLinkRender("Github"),
-    },
-    {
-        label: "版权",
-        field: "copyright",
-        render: commonLinkRender("Copyright © 2023-present 创智工作室"),
-    },
+  },
+  {
+    label: "版权",
+    field: "copyright",
+    render: commonLinkRender("Copyright © 2023-present 创智工作室"),
+  },
 ];
 
 const infoData = {
@@ -73,24 +73,20 @@ const infoData = {
 };
 
 const members = {
-    '项目架构设计 后端接口开发 基础页面开发': 'huanxiaomang',
-    '暂未参与': 'hakurei77',
-}
+  "项目架构设计 后端接口开发 基础页面开发": "huanxiaomang",
+  暂未参与: "hakurei77",
+};
 
 Object.keys(members).forEach((key) => {
   schema.push({ field: key, label: key });
 });
 
-
-
 const [register] = useDescription({
   title: "负责人员",
   data: members,
   schema: schema,
-  column:1 ,
+  column: 1,
 });
-
-
 
 const [infoRegister] = useDescription({
   title: "项目信息",

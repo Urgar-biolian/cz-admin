@@ -13,11 +13,13 @@ export function uploadApi(
   params: UploadFileParams,
   onUploadProgress: (progressEvent: AxiosProgressEvent) => void,
 ) {
-  return defHttp.uploadFile<UploadApiResult>(
-    {
-      url: uploadUrl,
-      onUploadProgress,
-    },
-    params,
-  );
+  return defHttp
+    .uploadFile<{ code: number; messages: string; result: UploadApiResult }>(
+      {
+        url: uploadUrl,
+        onUploadProgress,
+      },
+      params,
+    )
+    .then((response: any) => response?.data?.result ?? response?.data ?? response);
 }

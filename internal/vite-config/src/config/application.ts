@@ -80,6 +80,15 @@ function defineApplicationConfig(defineOptions: DefineOptions = {}) {
             modifyVars: generateModifyVars(),
             javascriptEnabled: true,
           },
+          scss: {
+            // 禁用弃用警告
+            quietDeps: true,
+            // 设置 Sass 选项以禁用弃用警告
+            sassOptions: {
+              quietDeps: true,
+              silenceDeprecations: ['legacy-js-api', 'import'],
+            },
+          },
         },
       },
       plugins,

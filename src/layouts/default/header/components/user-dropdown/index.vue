@@ -1,29 +1,51 @@
 <template>
-    <Dropdown placement="bottomLeft" :overlayClassName="`${prefixCls}-dropdown-overlay`">
-        <span :class="[prefixCls, `${prefixCls}--${theme}`]" class="flex">
-            <img :class="`${prefixCls}__header`" :src="getUserInfo.avatar" />
-            <span :class="`${prefixCls}__info hidden md:block`">
-                <span :class="`${prefixCls}__name ${getUsernameClassByRole(getUserInfo.role)}`" class="truncate">
-                    {{ getUserInfo.realName }}
-                </span>
-            </span>
+  <Dropdown
+    placement="bottomLeft"
+    :overlayClassName="`${prefixCls}-dropdown-overlay`"
+  >
+    <span :class="[prefixCls, `${prefixCls}--${theme}`]" class="flex">
+      <img :class="`${prefixCls}__header`" :src="getUserInfo.avatar" />
+      <span :class="`${prefixCls}__info hidden md:block`">
+        <span
+          :class="`${prefixCls}__name ${getUsernameClassByRole(getUserInfo.role)}`"
+          class="truncate"
+        >
+          {{ getUserInfo.realName }}
         </span>
+      </span>
+    </span>
 
-        <template #overlay>
-            <Menu @click="handleMenuClick">
-                <MenuItem key="doc" :text="t('layout.header.dropdownItemDoc')" icon="ion:document-text-outline"
-                    v-if="getShowDoc" />
-                <Menu.Divider v-if="getShowDoc" />
-                <MenuItem v-if="getShowApi" key="api" :text="t('layout.header.dropdownChangeApi')"
-                    icon="ant-design:swap-outlined" />
-                <MenuItem v-if="getUseLockPage" key="lock" :text="t('layout.header.tooltipLock')"
-                    icon="ion:lock-closed-outline" />
-                <MenuItem key="logout" :text="t('layout.header.dropdownItemLoginOut')" icon="ion:power-outline" />
-            </Menu>
-        </template>
-    </Dropdown>
-    <LockAction @register="register" />
-    <ChangeApi @register="registerApi" />
+    <template #overlay>
+      <Menu @click="handleMenuClick">
+        <MenuItem
+          key="doc"
+          :text="t('layout.header.dropdownItemDoc')"
+          icon="ion:document-text-outline"
+          v-if="getShowDoc"
+        />
+        <Menu.Divider v-if="getShowDoc" />
+        <MenuItem
+          v-if="getShowApi"
+          key="api"
+          :text="t('layout.header.dropdownChangeApi')"
+          icon="ant-design:swap-outlined"
+        />
+        <MenuItem
+          v-if="getUseLockPage"
+          key="lock"
+          :text="t('layout.header.tooltipLock')"
+          icon="ion:lock-closed-outline"
+        />
+        <MenuItem
+          key="logout"
+          :text="t('layout.header.dropdownItemLoginOut')"
+          icon="ion:power-outline"
+        />
+      </Menu>
+    </template>
+  </Dropdown>
+  <LockAction @register="register" />
+  <ChangeApi @register="registerApi" />
 </template>
 <script lang="ts" setup>
 import { Dropdown, Menu } from "ant-design-vue";
@@ -59,10 +81,14 @@ const { getShowDoc, getUseLockPage, getShowApi } = useHeaderSetting();
 const userStore = useUserStore();
 
 const getUserInfo = computed(() => {
-  const { username, avatar, description,role } = userStore.getUserInfo || {};
+  const { username, avatar, description, role } = userStore.getUserInfo || {};
 
-
-    return { realName: username, avatar: avatar || headerImg, desc: description, role };
+  return {
+    realName: username,
+    avatar: avatar || headerImg,
+    desc: description,
+    role,
+  };
 });
 
 const [register, { openModal }] = useModal();

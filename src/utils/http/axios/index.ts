@@ -55,7 +55,12 @@ const transform: AxiosTransform = {
     }
     //  这里 code，result，message为 后台统一的字段，需要在 types.ts内修改为项目自己的接口返回格式
     const { code, result, messages } = data;
-    const message = typeof messages === "string" ? messages : messages[Object.keys(messages)[0]]
+    const message =
+      typeof messages === "string"
+        ? messages
+        : messages && typeof messages === "object"
+          ? messages[Object.keys(messages)[0]]
+          : "";
 
     // 这里逻辑可以根据项目进行修改
     const hasSuccess =
@@ -94,8 +99,6 @@ const transform: AxiosTransform = {
         break;
       default:
         if (messages) {
-
-
           timeoutMsg = message;
         }
     }
@@ -186,7 +189,7 @@ const transform: AxiosTransform = {
       (config as Recordable).headers.Authorization =
         options.authenticationScheme
           ? `${options.authenticationScheme} ${token}`
-        : `Bearer ${token}`;
+          : `Bearer ${token}`;
     }
     return config;
   },
@@ -251,7 +254,7 @@ const transform: AxiosTransform = {
   },
 };
 
-function createAxios(opt?: Partial<CreateAxiosOptions>) {
+export function createAxios(opt?: Partial<CreateAxiosOptions>) {
   return new VAxios(
     // 深度合并
     deepMerge(
@@ -306,9 +309,8 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
 }
 export const defHttp = createAxios({
   requestOptions: {
-        apiUrl: 'http://1.92.82.236:3000/api',
-
-  }
+    apiUrl: globSetting.apiUrl,
+  },
 });
 
 // other api url
