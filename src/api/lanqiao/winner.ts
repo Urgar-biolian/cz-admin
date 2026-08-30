@@ -164,6 +164,19 @@ export function deleteWinner(id: number, mode: ErrorMessageMode = "modal") {
 }
 
 /**
+ * 调整成就展示顺序
+ */
+export function reorderWinners(
+  ids: number[],
+  mode: ErrorMessageMode = "modal",
+) {
+  return defHttp.put<{ success: boolean }>(
+    { url: `${Api.Winner}/reorder`, data: { ids } },
+    { errorMessageMode: mode, withToken: true },
+  );
+}
+
+/**
  * 批量删除获奖者
  */
 export function batchDeleteWinners(

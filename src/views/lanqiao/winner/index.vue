@@ -53,7 +53,7 @@
       bordered
       style="margin-top: 16px"
     >
-      <template #bodyCell="{ column, record }">
+      <template #bodyCell="{ column, record, index }">
         <template v-if="column.dataIndex === 'avatar'">
           <img
             :src="record.avatar"
@@ -83,6 +83,22 @@
           <span v-else style="color: #999">未关联</span>
         </template>
         <template v-else-if="column.dataIndex === 'action'">
+          <a
+            :style="index === 0 ? 'color:#c0c4cc;cursor:not-allowed' : ''"
+            @click="moveWinner(index, -1)"
+            >上移</a
+          >
+          <a-divider type="vertical" />
+          <a
+            :style="
+              index === winners.length - 1
+                ? 'color:#c0c4cc;cursor:not-allowed'
+                : ''
+            "
+            @click="moveWinner(index, 1)"
+            >下移</a
+          >
+          <a-divider type="vertical" />
           <a @click="editWinner(record)">编辑</a>
           <a-divider type="vertical" />
           <a-popconfirm
@@ -195,6 +211,7 @@ import {
   deleteWinner as apiDeleteWinner,
   filterWinnersByAward,
   uploadAvatar,
+  reorderWinners,
   Winner,
   CreateWinnerDto,
   UpdateWinnerDto,
@@ -373,6 +390,23 @@ function deleteWinner(id: number) {
     .catch((error) => {
       message.error("删除失败: " + (error.message || "未知错误"));
     });
+}
+
+async function moveWinner(index: number, delta: number) {
+  const target = index + delta;
+  if (target < 0 || target >= winners.value.length) return;
+
+  const list = [...winners.value];
+  [list[index], list[target]] = [list[target], list[index]];
+  winners.value = list;
+
+  try {
+    await reorderWinners(winners.value.map((w) => w.id));
+    message.success("展示顺序已更新");
+  } catch (error) {
+    message.error("排序更新失败: " + (error.message || "未知错误"));
+    fetchWinners();
+  }
 }
 
 async function beforeUpload(file: File) {
